@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, useScroll } from 'framer-motion';
 import { Bars3Icon, XMarkIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
@@ -42,12 +42,12 @@ const Navbar = () => {
             animate={{ y: 0 }}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16 md:h-24 py-2">
+                <div className="flex justify-between items-center h-24 py-2">
                     <div className="flex-shrink-0">
                         <img
                             src="/assets/images/meme_media_transparent.png"
                             alt="Meme Media Logo"
-                            className="h-12 md:h-20 w-auto"
+                            className="h-20 w-auto"
                         />
                     </div>
 

@@ -1,69 +1,48 @@
 import { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
-interface Service {
-    title: string;
-    description: string;
-    image: string;
-    category: string;
-    fullDescription: string;
-}
-
-const categories = [
-    'Sve',
-    'Development',
-    'E-commerce',
-    'SEO',
-    'Marketing',
-    'Branding'
-];
-
-const services: Service[] = [
+const services = [
     {
-        title: 'Web Development',
-        description: 'Moderne i responzivne web stranice prilagođene vašim potrebama.',
-        image: '/assets/images/web-dev.jpg',
-        category: 'Development',
-        fullDescription: 'Moderne i responzivne web stranice prilagođene vašim potrebama.'
+        title: "Web Development",
+        description: "Izrada modernih web stranica",
+        image: "/assets/images/web-dev.jpg",
+        fullDescription: "Pružamo kompletan servis izrade modernih web stranica, uključujući responzivni dizajn, optimizaciju performansi i integraciju s najnovijim tehnologijama. Naš tim stručnjaka osigurava da vaša web stranica bude brza, sigurna i laka za održavanje."
     },
     {
-        title: 'E-commerce',
-        description: 'Potpune e-commerce platforme s integracijom plaćanja.',
-        image: '/assets/images/ecommerce.jpg',
-        category: 'E-commerce',
-        fullDescription: 'Potpune e-commerce platforme s integracijom plaćanja.'
+        title: "E-commerce",
+        description: "Online trgovine i sustavi",
+        image: "/assets/images/ecommerce.jpg",
+        fullDescription: "Razvijamo napredne e-commerce sustave koji omogućavaju jednostavno upravljanje proizvodima, naručivanje i plaćanje. Uključujemo sve potrebne funkcionalnosti poput upravljanja zalihama, analitike prodaje i integracije s plaćanim sustavima."
     },
     {
-        title: 'SEO',
-        description: 'Optimizacija za tražilice i poboljšanje vidljivosti.',
-        image: '/assets/images/seo.jpg',
-        category: 'SEO',
-        fullDescription: 'Optimizacija za tražilice i poboljšanje vidljivosti.'
+        title: "SEO Optimization",
+        description: "Optimizacija za tražilice",
+        image: "/assets/images/seo.jpg",
+        fullDescription: "Optimiziramo vašu web stranicu za tražilice kako biste bili bolje vidljivi u rezultatima pretrage. Naš SEO pristup uključuje tehničku optimizaciju, optimizaciju sadržaja i analizu konkurencije."
     },
     {
-        title: 'Marketing',
-        description: 'Digitalni marketing i kampanje na društvenim mrežama.',
-        image: '/assets/images/marketing.jpg',
-        category: 'Marketing',
-        fullDescription: 'Digitalni marketing i kampanje na društvenim mrežama.'
+        title: "Digital Marketing",
+        description: "Marketing strategije",
+        image: "/assets/images/marketing.jpg",
+        fullDescription: "Razvijamo i implementiramo digitalne marketing strategije koje povećavaju vašu online prisutnost i privlače nove klijente. Uključujemo SEO, društvene mreže, PPC kampanje i analizu podataka."
     },
     {
-        title: 'Branding',
-        description: 'Vizualni identitet i branding strategije.',
-        image: '/assets/images/brand.jpg',
-        category: 'Branding',
-        fullDescription: 'Vizualni identitet i branding strategije.'
+        title: "Brand Design",
+        description: "Dizajn i brendiranje",
+        image: "/assets/images/brand.jpg",
+        fullDescription: "Kreiramo jedinstveni vizualni identitet vašeg brenda koji će vas istaknuti na tržištu. Naš tim dizajnera razvija logo, boje, tipografiju i vizualne elemente koji odgovaraju vašoj poslovnoj strategiji."
     }
 ];
 
 const Services = () => {
-    const [selectedCategory, setSelectedCategory] = useState('Sve');
-    const [selectedService, setSelectedService] = useState<Service | null>(null);
+    const { t } = useTranslation();
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"]
     });
+    const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
 
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 100,
@@ -72,16 +51,14 @@ const Services = () => {
         mass: 0.1
     });
 
-    const y = useTransform(smoothProgress, [0, 1], [0, -100]);
-    const opacity = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-    const scale = useTransform(smoothProgress, [0, 1], [0.8, 1]);
+    const carouselRotation = useTransform(smoothProgress, [0, 1], [0, -360]);
 
-    const filteredServices = selectedCategory === 'Sve'
-        ? services
-        : services.filter(service => service.category === selectedCategory);
+    const handleServiceClick = (service: typeof services[0]) => {
+        setSelectedService(service);
+    };
 
     return (
-        <section ref={containerRef} className="relative h-[200vh] bg-black pt-32">
+        <section ref={containerRef} className="relative h-[150vh] bg-black pt-32">
             <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-black via-neutral-900 to-black" />
 
@@ -90,73 +67,139 @@ const Services = () => {
                 </div>
 
                 <motion.div
-                    style={{ opacity, y, scale }}
-                    className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+                    style={{ opacity: useTransform(smoothProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]) }}
+                    className="absolute top-[15vh] left-0 right-0 text-center z-20"
                 >
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                            Naše Usluge
-                        </h2>
-                        <p className="text-xl text-white/70">
-                            Sve što vam treba za uspješan online posao
-                        </p>
-                    </div>
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                        {t('services.title')}
+                    </h2>
+                    <p className="text-lg text-white/70">
+                        {t('services.scrollHint')}
+                    </p>
+                </motion.div>
 
-                    <div className="flex flex-wrap justify-center gap-4 mb-12">
-                        {categories.map((category) => (
-                            <button
-                                key={category}
-                                onClick={() => setSelectedCategory(category)}
-                                className={`px-4 py-2 rounded-full text-sm sm:text-base font-medium transition-colors duration-300 ${selectedCategory === category
-                                    ? 'bg-orange-500 text-white'
-                                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                                    }`}
-                            >
-                                {category}
-                            </button>
-                        ))}
-                    </div>
+                <div
+                    style={{
+                        perspective: "2000px",
+                        perspectiveOrigin: "50% 50%"
+                    }}
+                    className="relative w-[1000px] h-[500px] mt-32"
+                >
+                    {services.map((service, index) => {
+                        const angle = (index * 360) / services.length;
+                        const radius = 300;
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredServices.map((service, index) => (
+                        const progress = useTransform(carouselRotation, (rotation) => {
+                            const currentAngle = (angle + rotation) % 360;
+                            return currentAngle / 360;
+                        });
+
+                        const x = useTransform(progress, (p) => {
+                            return Math.sin(p * Math.PI * 2) * radius;
+                        });
+
+                        const z = useTransform(progress, (p) => {
+                            return Math.cos(p * Math.PI * 2) * radius;
+                        });
+
+                        const isActive = useTransform(progress, (p) => {
+                            const normalizedProgress = ((p + 0.5) % 1);
+                            return Math.max(0, 1 - Math.abs(normalizedProgress - 0.5) * 2);
+                        });
+
+                        const y = useTransform(isActive, [0, 1], ["-50%", "-55%"]);
+                        const scale = useTransform(isActive, [0, 1], [0.8, 1]);
+
+                        return (
                             <motion.div
                                 key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                viewport={{ once: true }}
-                                className="group relative overflow-hidden rounded-lg bg-gray-900"
+                                style={{
+                                    position: "absolute",
+                                    left: "50%",
+                                    top: "50%",
+                                    x,
+                                    y,
+                                    z,
+                                    scale,
+                                    opacity: useTransform(isActive, [0, 1], [0.3, 1]),
+                                    filter: useTransform(isActive, (active) => `brightness(${active * 100 + 50}%)`),
+                                    pointerEvents: useTransform(isActive, (active) => active > 0.6 ? "auto" : "none"),
+                                    zIndex: useTransform(isActive, (active) => Math.round(active * 10))
+                                }}
+                                className="w-[240px] h-[340px] transition-all duration-300"
+                                whileHover={{
+                                    scale: 1.05,
+                                    transition: { duration: 0.2 }
+                                }}
                             >
-                                <div className="aspect-w-16 aspect-h-9">
-                                    <img
-                                        src={service.image}
-                                        alt={service.title}
-                                        className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-500"
+                                <div
+                                    className="relative group cursor-pointer"
+                                    onClick={() => handleServiceClick(service)}
+                                >
+                                    <motion.div
+                                        className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl blur-md"
+                                        style={{
+                                            opacity: useTransform(isActive, [0, 1], [0.2, 0.6])
+                                        }}
                                     />
-                                </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                                        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
-                                            {service.title}
-                                        </h3>
-                                        <p className="text-gray-300 text-sm sm:text-base mb-2">
-                                            {service.category}
-                                        </p>
-                                        <p className="text-gray-300 text-sm sm:text-base">
-                                            {service.description}
-                                        </p>
-                                        <button
-                                            onClick={() => setSelectedService(service)}
-                                            className="mt-4 inline-block bg-orange-500 text-white px-4 py-2 rounded-lg text-sm sm:text-base font-semibold hover:bg-orange-600 transition-colors duration-300"
-                                        >
-                                            Saznajte više
-                                        </button>
+
+                                    <div className="relative bg-black rounded-xl overflow-hidden h-full shadow-xl shadow-black/60">
+                                        <div className="h-44 overflow-hidden">
+                                            {service.image && (
+                                                <motion.img
+                                                    src={service.image}
+                                                    alt={service.title}
+                                                    className="w-full h-full object-cover"
+                                                    style={{
+                                                        scale: useTransform(isActive, [0, 1], [1, 1.1])
+                                                    }}
+                                                />
+                                            )}
+                                            <motion.div
+                                                className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"
+                                                style={{
+                                                    opacity: useTransform(isActive, [0, 1], [0.9, 0.7])
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="p-5 bg-black">
+                                            <motion.h3
+                                                className="text-xl font-bold mb-2"
+                                                style={{
+                                                    color: useTransform(isActive, [0, 1], ['#ffffff', '#f97316'])
+                                                }}
+                                            >
+                                                {service.title}
+                                            </motion.h3>
+                                            <motion.p
+                                                className="text-sm mb-4"
+                                                style={{
+                                                    color: useTransform(isActive, [0, 1], ['#6b7280', '#d1d5db'])
+                                                }}
+                                            >
+                                                {service.description}
+                                            </motion.p>
+
+                                            <motion.button
+                                                initial={false}
+                                                whileHover={{
+                                                    scale: 1.05,
+                                                    backgroundColor: "#ea580c",
+                                                    transition: { duration: 0.2 }
+                                                }}
+                                                whileTap={{ scale: 0.95 }}
+                                                className="px-4 py-2 bg-orange-500 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-orange-500/50 w-full text-sm font-semibold"
+                                            >
+                                                Saznaj više
+                                            </motion.button>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
-                        ))}
-                    </div>
-                </motion.div>
+                        );
+                    })}
+                </div>
             </div>
 
             <AnimatePresence>
@@ -165,28 +208,42 @@ const Services = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
                         onClick={() => setSelectedService(null)}
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-gray-900 rounded-lg p-6 max-w-2xl w-full"
+                            className="relative bg-black rounded-xl overflow-hidden max-w-4xl w-full max-h-[90vh] overflow-y-auto"
                             onClick={e => e.stopPropagation()}
                         >
-                            <h3 className="text-2xl font-bold text-white mb-4">
-                                {selectedService.title}
-                            </h3>
-                            <p className="text-gray-300 mb-4">
-                                {selectedService.fullDescription}
-                            </p>
                             <button
                                 onClick={() => setSelectedService(null)}
-                                className="bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors duration-300"
+                                className="absolute top-4 right-4 text-white/70 hover:text-white z-10"
                             >
-                                Zatvori
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                             </button>
+
+                            <div className="relative h-[300px]">
+                                <img
+                                    src={selectedService.image}
+                                    alt={selectedService.title}
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
+                            </div>
+
+                            <div className="p-6">
+                                <h3 className="text-3xl font-bold text-white mb-4">
+                                    {selectedService.title}
+                                </h3>
+                                <p className="text-gray-300 text-lg">
+                                    {selectedService.fullDescription}
+                                </p>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}
